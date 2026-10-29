@@ -1,0 +1,110 @@
+modus-button {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Modus 1.x: token overrides inherit into the shadow button */
+modus-button[color='primary'][button-style='fill'],
+modus-button[color='primary'][variant='filled'] {
+  --modus-btn-primary-bg: #0063a3;
+  --modus-btn-primary-border-color: #0063a3;
+  --modus-btn-primary-color: #ffffff;
+  --modus-btn-primary-hover-bg: #004b7c;
+  --modus-btn-primary-active-bg: #00548a;
+}
+
+modus-button[color='secondary'][button-style='outline'],
+modus-button[color='secondary'][variant='outline'] {
+  --modus-btn-outline-secondary-color: #121518;
+  --modus-btn-outline-secondary-bg: transparent;
+  --modus-btn-outline-secondary-hover-bg: #f4f5f7;
+  --modus-btn-outline-secondary-hover-color: #121518;
+}
+
+/* Fallback before custom element upgrade (CDN / JS delay) */
+modus-button:not(:defined)[color='primary'] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-height: 32px;
+  padding: 0 16px;
+  background-color: #0063a3;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  font-family: 'Open Sans', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.25;
+  cursor: pointer;
+}
+
+modus-button:not(:defined)[color='secondary'] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-height: 32px;
+  padding: 0 16px;
+  background-color: transparent;
+  color: #121518;
+  border: 1px solid #121518;
+  border-radius: 4px;
+  font-family: 'Open Sans', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.25;
+  cursor: pointer;
+}
+
+/* Modus 2.x / future ::part hook (ticket spec) */
+modus-button[color='primary'][variant='filled']::part(button),
+modus-button[color='primary'][button-style='fill']::part(button) {
+  background-color: #0063a3 !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 4px !important;
+  padding: 8px 16px !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+}
+
+modus-button[color='primary'][variant='filled']::part(button):hover,
+modus-button[color='primary'][button-style='fill']::part(button):hover {
+  background-color: #004b7c !important;
+}
+
+modus-button[color='secondary'][variant='outline']::part(button),
+modus-button[color='secondary'][button-style='outline']::part(button) {
+  background-color: transparent !important;
+  border: 1px solid #121518 !important;
+  color: #121518 !important;
+  border-radius: 4px !important;
+  padding: 8px 16px !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+}
+
+modus-button[color='secondary'][variant='outline']::part(button):hover,
+modus-button[color='secondary'][button-style='outline']::part(button):hover {
+  background-color: #f4f5f7 !important;
+}
+
+@media (max-width: 767px) {
+  modus-button::part(button) {
+    width: 100% !important;
+  }
+
+  modus-button:not(:defined) {
+    width: 100%;
+  }
+
+  .button-row--pair modus-button::part(button) {
+    width: auto !important;
+  }
+
+  .button-row--pair modus-button:not(:defined) {
+    width: auto;
+  }
+}

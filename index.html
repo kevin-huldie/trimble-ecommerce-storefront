@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Order confirmation for your Trimble purchase. Review order details, next steps, and recommended add-ons."
+    />
+    <title>Order confirmation | Trimble</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@trimble-oss/modus-web-components@1.8.2/dist/modus-web-components/modus-web-components.css"
+    />
+    <link rel="stylesheet" href="css/global.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/components/cards.css?v=20261029" />
+    <link rel="stylesheet" href="css/components/buttons.css" />
+    <link rel="stylesheet" href="css/sandbox.css" />
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@trimble-oss/modus-web-components@1.8.2/dist/modus-web-components/modus-web-components.esm.js"
+    ></script>
+  </head>
+  <body>
+    <!-- Accessibility Bypass Skip Link -->
+    <a href="#main-storefront-content" class="sr-only">Skip to Trimble Storefront</a>
+
+    <!-- Scenario Sandbox Utility Bar (Two-Tier Architecture) -->
+    <aside id="sandbox-bar" class="sandbox-container" aria-label="Prototype Testing Sandbox">
+      <!-- Tier 1: Global Identity & Session Context (Always Shown) -->
+      <div class="sandbox-tier-primary">
+        <div class="sandbox-brand-group">
+          <span class="sandbox-brand">Trimble Prototype Sandbox</span>
+
+          <div class="sandbox-control-group">
+            <label for="sandbox-feature-select">Feature:</label>
+            <select
+              id="sandbox-feature-select"
+              class="sandbox-select sandbox-select-feature"
+              aria-disabled="true"
+              tabindex="0"
+              title="DXPBK-1321 is currently active. Additional roadmap features will unlock here."
+            >
+              <option value="DXPBK-1321" selected>
+                DXPBK-1321 | Checkout Upsell &amp; Revenue Optimization
+              </option>
+              <option value="CART-01" disabled>CART-01 | Cart Flyout (Roadmap)</option>
+              <option value="CART-02" disabled>CART-02 | Shopping Cart Full Page (Roadmap)</option>
+              <option value="CHECKOUT-01" disabled>CHECKOUT-01 | Address &amp; Tax Flow (Roadmap)</option>
+              <option value="PLP-01" disabled>PLP-01 | Plans &amp; Pricing (Roadmap)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="sandbox-global-controls">
+          <div class="sandbox-control-group">
+            <label for="sandbox-role-select">Role:</label>
+            <select id="sandbox-role-select" class="sandbox-select">
+              <option value="account-owner" selected>Account Owner</option>
+              <option value="secondary-owner">Secondary Account Owner</option>
+              <option value="license-admin">License Admin</option>
+              <option value="product-user">Product User</option>
+            </select>
+          </div>
+
+          <div class="sandbox-control-group">
+            <label for="sandbox-purchase-select">Purchase Type:</label>
+            <select id="sandbox-purchase-select" class="sandbox-select">
+              <option value="saas-paid" selected>SaaS Subscription</option>
+              <option value="free-trial">Free Trial</option>
+              <option value="auto-convert">Auto-convert Trial</option>
+            </select>
+          </div>
+
+          <button
+            type="button"
+            id="sandbox-collapse-btn"
+            class="sandbox-toggle-btn"
+            title="Collapse Sandbox"
+            aria-label="Collapse Sandbox Bar"
+          >
+            &minus;
+          </button>
+        </div>
+      </div>
+
+      <!-- Tier 2: Dynamic Feature Sub-Bar (DXPBK-1321 Specific) -->
+      <div id="sandbox-feature-tier" class="sandbox-tier-secondary">
+        <div class="sandbox-sub-label">
+          <span class="sandbox-sub-icon" aria-hidden="true">&#8627;</span>
+          <span>Feature Controls (DXPBK-1321):</span>
+        </div>
+
+        <div class="sandbox-feature-controls">
+          <div class="sandbox-control-group">
+            <label for="sandbox-link-toggle">Upsell Section Text Link:</label>
+            <select id="sandbox-link-toggle" class="sandbox-select">
+              <option value="show" selected>Show</option>
+              <option value="hide">Hide</option>
+            </select>
+          </div>
+
+          <div class="sandbox-control-group">
+            <label for="sandbox-card-type-select">Card Type:</label>
+            <select id="sandbox-card-type-select" class="sandbox-select">
+              <option value="generic-plp" selected>
+                Generic Directory Cards (Linking to PLPs)
+              </option>
+              <option value="product-pdp">
+                Product-Specific Recommendation Cards (Linking to PDPs)
+              </option>
+            </select>
+          </div>
+
+          <div class="sandbox-control-group" id="sandbox-matrix-group">
+            <label for="sandbox-matrix-select">Matrix Mix:</label>
+            <select id="sandbox-matrix-select" class="sandbox-select" aria-disabled="true">
+              <option value="optimal" selected>Optimal Stack [T1+T2+T3]</option>
+              <option value="saas-heavy">SaaS Growth Heavy [T1+T1+T1]</option>
+              <option value="saas-ext">SaaS Dominant + Ext [T1+T1+T2]</option>
+              <option value="saas-learn">SaaS Dominant + Learn [T1+T1+T3]</option>
+              <option value="ext-heavy">Ecosystem / Ext Heavy [T2+T2+T3]</option>
+              <option value="pure-ext">Pure Extension [T2+T2+T2]</option>
+              <option value="enablement">Enablement Focus [T1+T3+T3]</option>
+              <option value="pure-learn">Pure Learning [T3+T3+T3]</option>
+            </select>
+          </div>
+
+          <div class="sandbox-control-group">
+            <label for="sandbox-upsell-select">Visible Upsell Cards:</label>
+            <select id="sandbox-upsell-select" class="sandbox-select">
+              <option value="3-cards" selected>3 Cards (Default)</option>
+              <option value="2-cards">2 Cards</option>
+              <option value="1-card">1 Card</option>
+              <option value="0-cards">0 Cards (Hide)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Floating Reopen Trigger -->
+    <button type="button" id="sandbox-reopen-btn" class="sandbox-reopen-btn" aria-label="Open Sandbox Controls">
+      &#9881; Sandbox
+    </button>
+
+    <!-- ARIA Live Announcement Region -->
+    <div id="sandbox-a11y-status" class="sr-only" aria-live="polite"></div>
+
+    <header class="site-header">
+      <div class="page-container site-header__inner">
+        <a class="site-header__logo trimble-wordmark trimble-wordmark--header" href="https://www.trimble.com" aria-label="Trimble home">
+          <svg
+            class="trimble-wordmark__svg"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 88 28"
+            width="88"
+            height="28"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <text
+              class="trimble-wordmark__text"
+              x="0"
+              y="21"
+              font-family="'Open Sans', Arial, sans-serif"
+              font-size="18"
+              font-weight="700"
+            >
+              Trimble
+            </text>
+          </svg>
+        </a>
+        <div class="site-header__end">
+          <div class="locale-selector" role="group" aria-label="Region and language">
+            <modus-icon name="globe" size="20" aria-hidden="true"></modus-icon>
+            <span>North America | English</span>
+          </div>
+          <div class="user-avatar" aria-label="Signed in as John Doe">JD</div>
+        </div>
+      </div>
+    </header>
+
+    <main id="main-storefront-content">
+      <section class="order-receipt-band" aria-labelledby="order-thank-you-heading">
+        <div class="page-container">
+          <div class="order-receipt-grid">
+            <div class="order-receipt__content">
+              <h1 id="order-thank-you-heading" class="order-receipt__heading">
+                Thank you for placing your order.
+              </h1>
+              <p class="order-receipt__order-number">
+                Order Number: <strong>000000</strong>
+              </p>
+              <p id="sandbox-receipt-body" class="order-receipt__body">
+                You will receive an email with your purchase details at
+                <a href="mailto:name@email.com">name@email.com</a>. Please retain this confirmation as
+                your proof of purchase. Payment will show up on your statement as &lsquo;Trimble.&rsquo;
+              </p>
+              <p id="sandbox-receipt-addon" class="order-receipt__body" hidden></p>
+              <p class="order-receipt__support">
+                If you require any assistance, you can easily initiate the process online. Our
+                <a href="https://www.trimble.com/en/support">customer support</a> team will work to find
+                a suitable solution for you.
+              </p>
+              <div class="ssl-badge">
+                <img
+                  class="ssl-badge__logo"
+                  src="https://www.digicert.com/images/t/digicert-logo.svg"
+                  alt=""
+                  width="80"
+                  height="32"
+                  onerror="this.style.display='none'"
+                />
+                <p class="ssl-badge__text">
+                  <strong>SSL Secure Connection.</strong>
+                  <span class="ssl-badge__validation">
+                    Validated as a secure site for sending and receiving sensitive data.
+                  </span>
+                </p>
+              </div>
+            </div>
+
+            <aside class="order-details-card" aria-labelledby="order-details-title">
+              <h2 id="order-details-title" class="order-details-card__title">Order Details</h2>
+              <table class="order-table">
+                <caption class="sr-only">Line items in your order</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Item</th>
+                    <th scope="col">QTY</th>
+                    <th scope="col">Unit Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Product Name</td>
+                    <td>1</td>
+                    <td>$0,000.00</td>
+                  </tr>
+                </tbody>
+              </table>
+              <ul class="order-summary">
+                <li>
+                  <span>Subtotal</span>
+                  <span>$0,000.00</span>
+                </li>
+                <li>
+                  <span>Promotions</span>
+                  <span>&mdash;</span>
+                </li>
+                <li>
+                  <span class="order-summary__label">
+                    Estimated Tax
+                    <modus-icon
+                      name="info"
+                      size="16"
+                      aria-label="Tax is estimated based on your billing address"
+                    ></modus-icon>
+                  </span>
+                  <span>$0,000.00</span>
+                </li>
+                <li class="order-summary__total">
+                  <span>Total (USD)</span>
+                  <span id="sandbox-order-total">$0,000.00</span>
+                </li>
+              </ul>
+              <div class="order-details-card__actions">
+                <modus-button
+                  color="primary"
+                  button-style="fill"
+                  variant="filled"
+                  size="medium"
+                  onclick="window.open('https://admin.trimble.com', '_blank', 'noopener,noreferrer')"
+                >
+                  View orders
+                </modus-button>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-block section-block--alt" aria-labelledby="setup-section-title">
+        <div class="page-container">
+          <header class="section-header">
+            <h2 id="setup-section-title" class="section-header__title">Order Confirmation</h2>
+            <p class="section-header__subtitle">
+              Follow the steps below to finalize the setup for your new products.
+            </p>
+          </header>
+
+          <div class="card-grid-3 card-grid-3--setup card-grid-3--equal-height">
+            <modus-card
+              class="setup-card-host"
+              width="100%"
+              height="100%"
+              show-card-border="false"
+              show-shadow-on-hover="false"
+            >
+              <div class="setup-card-inner">
+                <h3 class="setup-card__title">Purchase Details</h3>
+                <div class="setup-card__row">
+                  <span class="setup-card__label">Date</span>
+                  <p class="setup-card__value">Month 00, 2026</p>
+                </div>
+                <div class="setup-card__row">
+                  <span class="setup-card__label">Payment Method</span>
+                  <div class="payment-method">
+                    <p class="setup-card__value setup-card__value--emphasis">Card ending in: 0000</p>
+                    <p class="setup-card__value">Expires on MM/YY</p>
+                    <span class="visa-badge" aria-label="Visa">VISA</span>
+                  </div>
+                </div>
+              </div>
+            </modus-card>
+
+            <modus-card
+              id="sandbox-setup-card-2"
+              class="setup-card-host"
+              width="100%"
+              height="100%"
+              show-card-border="false"
+              show-shadow-on-hover="false"
+            >
+              <div class="setup-card-inner">
+                <h3 class="setup-card__title">Next Steps</h3>
+                <div class="setup-card__block">
+                  <h4 class="setup-card__block-title">Ready to dive in?</h4>
+                  <p class="setup-card__block-text">You can now start using your products.</p>
+                  <modus-button
+                    color="primary"
+                    button-style="fill"
+                    variant="filled"
+                    size="medium"
+                    onclick="location.href='https://admin.trimble.com'"
+                  >
+                    Get started
+                  </modus-button>
+                </div>
+                <div class="setup-card__block">
+                  <h4 class="setup-card__block-title">Activate for Your Team</h4>
+                  <p class="setup-card__block-text">
+                    Manage and delegate licenses to other team members in the Trimble Admin Console.
+                  </p>
+                  <div id="sandbox-owner-team-actions" class="button-row button-row--pair">
+                    <modus-button
+                      id="sandbox-btn-assign-licenses"
+                      color="primary"
+                      button-style="fill"
+                      variant="filled"
+                      size="medium"
+                      onclick="location.href='https://admin.trimble.com'"
+                    >
+                      Assign licenses to my team
+                    </modus-button>
+                    <modus-button
+                      color="secondary"
+                      button-style="outline"
+                      variant="outline"
+                      size="medium"
+                      onclick="location.href='https://www.trimble.com/en/support'"
+                    >
+                      Learn more
+                    </modus-button>
+                  </div>
+                </div>
+              </div>
+            </modus-card>
+
+            <modus-card
+              class="setup-card-host"
+              width="100%"
+              height="100%"
+              show-card-border="false"
+              show-shadow-on-hover="false"
+            >
+              <div class="setup-card-inner">
+                <h3 class="setup-card__title">Need Help?</h3>
+                <ul class="setup-card__links">
+                  <li>
+                    <a href="https://www.trimble.com/en/support">Contact Trimble Support</a>
+                  </li>
+                  <li>
+                    <a href="https://id.trimble.com">Trimble ID FAQ</a>
+                  </li>
+                </ul>
+                <hr class="setup-card__divider" />
+                <p class="setup-card__quick-links-title">Quick Links</p>
+                <ul class="setup-card__links">
+                  <li>
+                    <a href="https://id.trimble.com">Manage Your Profile</a>
+                  </li>
+                  <li>
+                    <a href="https://admin.trimble.com">View Order History</a>
+                  </li>
+                </ul>
+              </div>
+            </modus-card>
+          </div>
+        </div>
+      </section>
+
+      <section
+        id="section-3-upsell"
+        class="section-block section-block--alt"
+        aria-labelledby="recommended-section-title"
+      >
+        <div class="page-container">
+          <header class="section-header section-header--split">
+            <div>
+              <h2 id="recommended-section-title" class="section-header__title">
+                Recommended Add-Ons &amp; Training
+              </h2>
+              <p class="section-header__subtitle">
+                Enhance your workflow with compatible extensions, software, and learning modules.
+              </p>
+            </div>
+            <a
+              id="section-3-marketplace-link"
+              class="section-header__link"
+              href="https://marketplace.trimble.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Browse Marketplace &rarr;
+            </a>
+          </header>
+
+          <div
+            id="sandbox-upsell-grid"
+            class="card-grid card-grid-3 card-grid-3--recommendations"
+          >
+            <modus-card
+              class="recommendation-card"
+              data-sandbox-upsell-card="1"
+              width="100%"
+              height="100%"
+              border-radius="8px"
+              show-card-border="false"
+              show-shadow-on-hover="false"
+            >
+              <div class="recommendation-card__shell">
+                <div class="recommendation-card__media">
+                  <div
+                    class="card-media-banner card-media-banner--placeholder"
+                    role="img"
+                    aria-label="Software and add-ons preview"
+                  ></div>
+                </div>
+                <div class="recommendation-card__body">
+                  <span class="card-eyebrow">Trimble Software</span>
+                  <h3 class="card-title">Explore Software &amp; Add-Ons</h3>
+                  <p class="card-description">
+                    Expand your operational workflows with specialized cloud solutions, seat expansion
+                    options, and premium modules.
+                  </p>
+                </div>
+                <div class="recommendation-card__footer">
+                  <modus-button
+                    color="primary"
+                    button-style="fill"
+                    variant="filled"
+                    size="medium"
+                    onclick="location.href='https://www.trimble.com/en/products/software'"
+                  >
+                    Browse software catalog
+                  </modus-button>
+                </div>
+              </div>
+            </modus-card>
+
+            <modus-card
+              class="recommendation-card"
+              data-sandbox-upsell-card="2"
+              width="100%"
+              height="100%"
+              border-radius="8px"
+              show-card-border="false"
+              show-shadow-on-hover="false"
+            >
+              <div class="recommendation-card__shell">
+                <div class="recommendation-card__media">
+                  <div
+                    class="card-media-banner card-media-banner--placeholder"
+                    role="img"
+                    aria-label="Marketplace plugins preview"
+                  ></div>
+                </div>
+                <div class="recommendation-card__body">
+                  <span class="card-eyebrow">Trimble Marketplace</span>
+                  <h3 class="card-title">Discover 100+ Workflow Plugins</h3>
+                  <p class="card-description">
+                    Browse certified third-party integrations, extensions, and workflow plugins designed
+                    to enhance your tools.
+                  </p>
+                </div>
+                <div class="recommendation-card__footer">
+                  <modus-button
+                    color="primary"
+                    button-style="fill"
+                    variant="filled"
+                    size="medium"
+                    onclick="window.open('https://marketplace.trimble.com', '_blank', 'noopener,noreferrer')"
+                  >
+                    Browse marketplace
+                  </modus-button>
+                </div>
+              </div>
+            </modus-card>
+
+            <modus-card
+              class="recommendation-card"
+              data-sandbox-upsell-card="3"
+              width="100%"
+              height="100%"
+              border-radius="8px"
+              show-card-border="false"
+              show-shadow-on-hover="false"
+            >
+              <div class="recommendation-card__shell">
+                <div class="recommendation-card__media">
+                  <div
+                    class="card-media-banner card-media-banner--placeholder"
+                    role="img"
+                    aria-label="Training courses preview"
+                  ></div>
+                </div>
+                <div class="recommendation-card__body">
+                  <span class="card-eyebrow">Trimble Learn</span>
+                  <h3 class="card-title">Master Your New Software</h3>
+                  <p class="card-description">
+                    Accelerate team onboarding with self-paced video tutorials, live webinars, and
+                    accredited certification tracks.
+                  </p>
+                </div>
+                <div class="recommendation-card__footer">
+                  <modus-button
+                    color="primary"
+                    button-style="fill"
+                    variant="filled"
+                    size="medium"
+                    onclick="location.href='https://learn.trimble.com'"
+                  >
+                    Explore training courses
+                  </modus-button>
+                </div>
+              </div>
+            </modus-card>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="page-container site-footer__grid">
+        <div class="site-footer__brand">
+          <a class="site-footer__logo trimble-wordmark trimble-wordmark--footer" href="https://www.trimble.com" aria-label="Trimble home">
+            <svg
+              class="trimble-wordmark__svg"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 88 28"
+              width="88"
+              height="28"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <text
+                class="trimble-wordmark__text"
+                x="0"
+                y="21"
+                font-family="'Open Sans', Arial, sans-serif"
+                font-size="18"
+                font-weight="700"
+              >
+                Trimble
+              </text>
+            </svg>
+          </a>
+          <p class="site-footer__copyright">&copy; 2026, Trimble Inc.</p>
+        </div>
+        <p class="site-footer__mission">
+          Trimble is transforming the way the world works by delivering products and services that
+          connect the physical and digital worlds. Core technologies in positioning, modeling,
+          connectivity and data analytics enable customers to improve productivity, quality, safety
+          and sustainability. From purpose-built products to enterprise lifecycle solutions, Trimble
+          software, hardware and services are transforming industries such as agriculture,
+          construction, geospatial and transportation.
+        </p>
+        <nav class="site-footer__links" aria-label="Legal and privacy">
+          <a href="https://www.trimble.com/en/legal/terms-and-conditions">Legal Terms and Conditions</a>
+          <a href="https://www.trimble.com/en/legal/privacy-notice">Privacy Notice</a>
+          <a href="https://www.trimble.com/en/legal/website-terms-of-use">Website Terms of Use</a>
+          <a href="https://www.trimble.com/en/legal/california-notice-at-collection"
+            >California Notice at Collection</a
+          >
+          <a href="https://www.trimble.com/en/legal/privacy-center">Privacy Center</a>
+          <a href="https://www.trimble.com/en/legal/your-privacy-choices" class="privacy-choices">
+            Your Privacy Choices
+            <span class="privacy-choices__icon" aria-hidden="true"></span>
+          </a>
+        </nav>
+      </div>
+    </footer>
+    <script src="js/sandbox.js"></script>
+  </body>
+</html>
