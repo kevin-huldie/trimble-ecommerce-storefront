@@ -113,6 +113,25 @@
   max-width: 42rem;
 }
 
+.order-receipt__trial-list {
+  margin: 12px 0 0;
+  padding-left: 1.25rem;
+  list-style-type: disc;
+}
+
+.order-receipt__trial-list li {
+  margin-bottom: 8px;
+  padding-left: 0.25rem;
+}
+
+.order-receipt__trial-list li:last-child {
+  margin-bottom: 0;
+}
+
+.order-receipt__trial-list-label {
+  font-weight: 700;
+}
+
 .order-receipt__support {
   margin: 0 0 32px;
   font-size: 16px;

@@ -226,3 +226,249 @@ modus-card.recommendation-card .recommendation-card__footer modus-button {
   width: 100% !important;
   min-height: 100%;
 }
+
+/* Order Details Card & Receipt Table */
+.order-details-card {
+  background-color: #ffffff;
+  border: 1px solid #d2d5d9;
+  border-radius: 4px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.order-details-title {
+  font-family: 'Open Sans', system-ui, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #121518;
+  margin-bottom: 20px;
+}
+
+.receipt-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 4px;
+  margin-bottom: 16px;
+  table-layout: fixed;
+}
+
+.order-details-card .receipt-table col.receipt-col-qty {
+  width: 56px;
+}
+
+.order-details-card .receipt-table col.receipt-col-amount {
+  width: 108px;
+}
+
+.receipt-table th,
+.receipt-table td {
+  font-family: 'Open Sans', system-ui, sans-serif;
+  font-size: 13px;
+}
+
+.order-details-card .order-table.receipt-table thead th {
+  min-height: 20px;
+  line-height: 20px;
+  padding: 0 !important;
+  box-sizing: border-box;
+  vertical-align: top;
+}
+
+.receipt-table thead th {
+  color: #464d54;
+  font-weight: 600;
+  border-bottom: 1px solid #e1e3e6;
+  text-align: left;
+  height: 20px;
+}
+
+.receipt-table thead th.receipt-col-qty {
+  text-align: center;
+}
+
+.receipt-table thead th.receipt-col-amount {
+  text-align: right !important;
+}
+
+.order-details-card .order-table.receipt-table .receipt-amount {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  padding-left: 12px;
+  padding-right: 0;
+}
+
+/* Summary/total rows: amount cell is 2nd child (after colspan label), not 3rd — override layout center-QTY rule */
+.order-details-card .order-table.receipt-table tr.receipt-summary-row > td.receipt-amount,
+.order-details-card .order-table.receipt-table tr.receipt-total-row > td.receipt-amount {
+  text-align: right !important;
+}
+
+.receipt-table .receipt-col-qty {
+  text-align: center !important;
+  width: 56px;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+.order-details-card .order-table.receipt-table .receipt-col-item {
+  width: auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.receipt-item-title {
+  font-weight: 600;
+  color: #121518;
+  line-height: 20px;
+  min-height: 20px;
+  margin-bottom: 4px;
+}
+
+.receipt-item-subtext {
+  font-size: 11px;
+  color: #6a737d;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  line-height: 16px;
+}
+
+.receipt-item-subtext--indent {
+  padding-left: 14px;
+}
+
+.receipt-summary-row .receipt-summary-label,
+.receipt-total-row .receipt-summary-label {
+  font-weight: 400;
+  color: #464d54;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: none !important;
+}
+
+.receipt-summary-row .receipt-amount {
+  font-weight: 600;
+  color: #121518;
+  vertical-align: top;
+  border-bottom: none !important;
+}
+
+/* Override layout.css .order-table td borders between summary rows */
+.order-details-card .receipt-table .receipt-summary-row th,
+.order-details-card .receipt-table .receipt-summary-row td,
+.order-details-card .receipt-table .receipt-total-row th,
+.order-details-card .receipt-table .receipt-total-row td {
+  border-bottom: none !important;
+}
+
+/* Keep amount column aligned (override layout .order-table nth-child rules) */
+.order-details-card .order-table.receipt-table tr.receipt-item-row > td:nth-child(2),
+.order-details-card .order-table.receipt-table thead th:nth-child(2) {
+  text-align: center !important;
+  width: 56px;
+}
+
+.order-details-card .order-table.receipt-table tr.receipt-item-row > td:nth-child(3),
+.order-details-card .order-table.receipt-table thead th:nth-child(3) {
+  text-align: right !important;
+  width: 108px;
+}
+
+.receipt-table .receipt-adjustment-row th {
+  padding-left: 14px !important;
+  font-weight: 400;
+  color: #464d54;
+}
+
+.receipt-table .receipt-adjustment-row .proration-subtext {
+  padding-left: 0;
+  margin-top: 2px;
+  font-size: 11px;
+  color: #6a737d;
+}
+
+/* Uniform 4px vertical padding between summary rows */
+.receipt-table tbody td,
+.receipt-table tfoot th,
+.receipt-table tfoot td {
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+  line-height: 1.4;
+}
+
+.receipt-table tbody tr.receipt-item-row td {
+  padding-top: 8px !important;
+  padding-bottom: 12px !important;
+  border-bottom: 1px solid #e1e3e6;
+  vertical-align: top !important;
+}
+
+.receipt-table tbody tr.receipt-item-row .receipt-col-qty,
+.receipt-table tbody tr.receipt-item-row .receipt-amount {
+  vertical-align: top !important;
+  line-height: 20px;
+  padding-top: 8px !important;
+}
+
+.receipt-table tr.receipt-new-subtotal-row th,
+.receipt-table tr.receipt-new-subtotal-row td {
+  border-top: 1px solid #d2d5d9 !important;
+  padding-top: 8px !important;
+  margin-top: 4px;
+  font-weight: 700 !important;
+  color: #121518 !important;
+  border-bottom: none !important;
+}
+
+.receipt-new-subtotal-row td.receipt-amount {
+  text-align: right !important;
+}
+
+.receipt-table tfoot tr.receipt-total-row th,
+.receipt-table tfoot tr.receipt-total-row td {
+  border-top: 1px solid #e1e3e6 !important;
+  padding-top: 10px !important;
+  padding-bottom: 8px !important;
+}
+
+.receipt-discount-val {
+  color: #008544 !important;
+}
+
+.proration-subtext {
+  font-size: 11px;
+  font-weight: 400;
+  color: #6a737d;
+  margin-top: 2px;
+  line-height: 1.3;
+}
+
+.tax-info-icon {
+  display: inline-block;
+  font-size: 11px;
+  color: #0063a3;
+  cursor: help;
+  margin-left: 2px;
+}
+
+.order-details-card .receipt-table tfoot .receipt-summary-row th,
+.order-details-card .receipt-table tfoot .receipt-summary-row td,
+.order-details-card .receipt-table tfoot .receipt-new-subtotal-row th,
+.order-details-card .receipt-table tfoot .receipt-new-subtotal-row td,
+.order-details-card .receipt-table tfoot .receipt-total-row th,
+.order-details-card .receipt-table tfoot .receipt-total-row td {
+  border-bottom: none !important;
+}
+
+.receipt-total-row th.receipt-summary-label,
+.receipt-total-row .receipt-total-amount {
+  font-size: 15px;
+  font-weight: 700;
+  color: #121518;
+}
+
+.order-details-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}

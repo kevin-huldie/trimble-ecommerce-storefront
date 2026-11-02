@@ -29,60 +29,66 @@
     <!-- Scenario Sandbox Utility Bar (Two-Tier Architecture) -->
     <aside id="sandbox-bar" class="sandbox-container" aria-label="Prototype Testing Sandbox">
       <!-- Tier 1: Global Identity & Session Context (Always Shown) -->
-      <div class="sandbox-tier-primary">
-        <div class="sandbox-brand-group">
-          <span class="sandbox-brand">Trimble Prototype Sandbox</span>
+      <div id="sandbox-session-tier" class="sandbox-tier-primary">
+        <span class="sandbox-brand">Trimble Prototype Sandbox</span>
 
-          <div class="sandbox-control-group">
-            <label for="sandbox-feature-select">Feature:</label>
-            <select
-              id="sandbox-feature-select"
-              class="sandbox-select sandbox-select-feature"
-              aria-disabled="true"
-              tabindex="0"
-              title="DXPBK-1321 is currently active. Additional roadmap features will unlock here."
-            >
-              <option value="DXPBK-1321" selected>
-                DXPBK-1321 | Checkout Upsell &amp; Revenue Optimization
-              </option>
-              <option value="CART-01" disabled>CART-01 | Cart Flyout (Roadmap)</option>
-              <option value="CART-02" disabled>CART-02 | Shopping Cart Full Page (Roadmap)</option>
-              <option value="CHECKOUT-01" disabled>CHECKOUT-01 | Address &amp; Tax Flow (Roadmap)</option>
-              <option value="PLP-01" disabled>PLP-01 | Plans &amp; Pricing (Roadmap)</option>
-            </select>
-          </div>
+        <div class="sandbox-control-group sandbox-control-inline">
+          <label for="sandbox-feature-select">Feature Scope:</label>
+          <select
+            id="sandbox-feature-select"
+            class="sandbox-select sandbox-select-feature"
+            disabled
+            aria-disabled="true"
+            title="DXPBK-1321 is currently active. Additional roadmap features will unlock here."
+          >
+            <option value="dxpbk-1321" selected>
+              DXPBK-1321 | Checkout Upsell &amp; Revenue Optimization
+            </option>
+          </select>
         </div>
 
-        <div class="sandbox-global-controls">
-          <div class="sandbox-control-group">
-            <label for="sandbox-role-select">Role:</label>
-            <select id="sandbox-role-select" class="sandbox-select">
+        <div class="sandbox-control-group sandbox-control-inline">
+          <label for="sandbox-role-select">Role &amp; Permissions:</label>
+          <select id="sandbox-role-select" class="sandbox-select">
+            <optgroup label="Commercial Authorities (Buyers)">
               <option value="account-owner" selected>Account Owner</option>
               <option value="secondary-owner">Secondary Account Owner</option>
+            </optgroup>
+            <optgroup label="Operational Roles (Non-Buyers)">
               <option value="license-admin">License Admin</option>
               <option value="product-user">Product User</option>
-            </select>
-          </div>
-
-          <div class="sandbox-control-group">
-            <label for="sandbox-purchase-select">Purchase Type:</label>
-            <select id="sandbox-purchase-select" class="sandbox-select">
-              <option value="saas-paid" selected>SaaS Subscription</option>
-              <option value="free-trial">Free Trial</option>
-              <option value="auto-convert">Auto-convert Trial</option>
-            </select>
-          </div>
-
-          <button
-            type="button"
-            id="sandbox-collapse-btn"
-            class="sandbox-toggle-btn"
-            title="Collapse Sandbox"
-            aria-label="Collapse Sandbox Bar"
-          >
-            &minus;
-          </button>
+            </optgroup>
+          </select>
         </div>
+
+        <div class="sandbox-control-group sandbox-control-inline">
+          <label for="sandbox-purchase-select">Purchase Type:</label>
+          <select id="sandbox-purchase-select" class="sandbox-select">
+            <option value="saas-paid" selected>SaaS Subscription</option>
+            <option value="free-trial">Free Trial</option>
+            <option value="auto-convert">Auto-convert Trial</option>
+            <option value="trimble-credits">Trimble Credits</option>
+            <option value="partial-term">SaaS Partial Term Adjustment</option>
+          </select>
+        </div>
+
+        <div class="sandbox-control-group sandbox-control-inline" id="sandbox-promo-group">
+          <label for="sandbox-promo-select">Promo Code:</label>
+          <select id="sandbox-promo-select" class="sandbox-select">
+            <option value="applied" selected>Applied (PROMO20)</option>
+            <option value="none">None</option>
+          </select>
+        </div>
+
+        <button
+          type="button"
+          id="sandbox-collapse-btn"
+          class="sandbox-toggle-btn sandbox-tier-primary__collapse"
+          title="Collapse Sandbox"
+          aria-label="Collapse Sandbox Bar"
+        >
+          &minus;
+        </button>
       </div>
 
       <!-- Tier 2: Dynamic Feature Sub-Bar (DXPBK-1321 Specific) -->
@@ -94,6 +100,15 @@
 
         <div class="sandbox-feature-controls">
           <div class="sandbox-control-group">
+            <label for="sandbox-stage-select">Release Stage:</label>
+            <select id="sandbox-stage-select" class="sandbox-select">
+              <option value="stage-1" selected>Stage 1: MVP</option>
+              <option value="stage-2">Stage 2: Enhanced</option>
+              <option value="stage-3">Stage 3: North Star</option>
+            </select>
+          </div>
+
+          <div class="sandbox-control-group" id="sandbox-link-toggle-group">
             <label for="sandbox-link-toggle">Upsell Section Text Link:</label>
             <select id="sandbox-link-toggle" class="sandbox-select">
               <option value="show" selected>Show</option>
@@ -101,15 +116,11 @@
             </select>
           </div>
 
-          <div class="sandbox-control-group">
+          <div class="sandbox-control-group sandbox-control-inline">
             <label for="sandbox-card-type-select">Card Type:</label>
             <select id="sandbox-card-type-select" class="sandbox-select">
-              <option value="generic-plp" selected>
-                Generic Directory Cards (Linking to PLPs)
-              </option>
-              <option value="product-pdp">
-                Product-Specific Recommendation Cards (Linking to PDPs)
-              </option>
+              <option value="generic-plp" selected>Directory Gateways</option>
+              <option value="product-pdp">Product Recommendations</option>
             </select>
           </div>
 
@@ -147,6 +158,43 @@
 
     <!-- ARIA Live Announcement Region -->
     <div id="sandbox-a11y-status" class="sr-only" aria-live="polite"></div>
+    <div id="sandbox-north-star-toast" class="sandbox-north-star-toast" role="status" hidden></div>
+
+    <div class="page-container sandbox-dev-note-wrap">
+      <aside
+        id="prototype-stage-dev-note"
+        class="sandbox-dev-note"
+        role="note"
+        aria-label="Prototype Evaluation Guide"
+      >
+        <div class="sandbox-dev-note-header">
+          <div class="sandbox-dev-note-title">
+            <span class="sandbox-dev-icon" aria-hidden="true">ℹ</span>
+            <strong id="stage-note-title">STAGE 1: MVP SCOPE ACTIVE</strong>
+          </div>
+          <button
+            type="button"
+            id="stage-note-toggle-btn"
+            class="sandbox-dev-toggle-btn"
+            aria-expanded="true"
+            aria-controls="stage-note-body"
+          >
+            Hide Dev Notes
+          </button>
+        </div>
+        <div id="stage-note-body" class="sandbox-dev-note-body">
+          <p id="stage-note-summary" class="sandbox-dev-note-summary">
+            Baseline production release: Section 3 displays deterministic directory gateways based on
+            cart SKU family.
+          </p>
+          <div id="stage-note-details" class="sandbox-stage-details"></div>
+          <div id="stage-note-hint" class="sandbox-dev-hint">
+            💡 <strong>Evaluator Focus:</strong> Validate deterministic catalog routing and confirm
+            &quot;View Orders&quot; transitions cleanly to Trimble Admin Console.
+          </div>
+        </div>
+      </aside>
+    </div>
 
     <header class="site-header">
       <div class="page-container site-header__inner">
@@ -190,14 +238,14 @@
               <h1 id="order-thank-you-heading" class="order-receipt__heading">
                 Thank you for placing your order.
               </h1>
-              <p class="order-receipt__order-number">
+              <p id="sandbox-receipt-order-number" class="order-receipt__order-number">
                 Order Number: <strong>000000</strong>
               </p>
-              <p id="sandbox-receipt-body" class="order-receipt__body">
+              <div id="sandbox-receipt-body" class="order-receipt__body">
                 You will receive an email with your purchase details at
                 <a href="mailto:name@email.com">name@email.com</a>. Please retain this confirmation as
                 your proof of purchase. Payment will show up on your statement as &lsquo;Trimble.&rsquo;
-              </p>
+              </div>
               <p id="sandbox-receipt-addon" class="order-receipt__body" hidden></p>
               <p class="order-receipt__support">
                 If you require any assistance, you can easily initiate the process online. Our
@@ -222,57 +270,18 @@
               </div>
             </div>
 
-            <aside class="order-details-card" aria-labelledby="order-details-title">
-              <h2 id="order-details-title" class="order-details-card__title">Order Details</h2>
-              <table class="order-table">
-                <caption class="sr-only">Line items in your order</caption>
-                <thead>
-                  <tr>
-                    <th scope="col">Item</th>
-                    <th scope="col">QTY</th>
-                    <th scope="col">Unit Price</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Product Name</td>
-                    <td>1</td>
-                    <td>$0,000.00</td>
-                  </tr>
-                </tbody>
-              </table>
-              <ul class="order-summary">
-                <li>
-                  <span>Subtotal</span>
-                  <span>$0,000.00</span>
-                </li>
-                <li>
-                  <span>Promotions</span>
-                  <span>&mdash;</span>
-                </li>
-                <li>
-                  <span class="order-summary__label">
-                    Estimated Tax
-                    <modus-icon
-                      name="info"
-                      size="16"
-                      aria-label="Tax is estimated based on your billing address"
-                    ></modus-icon>
-                  </span>
-                  <span>$0,000.00</span>
-                </li>
-                <li class="order-summary__total">
-                  <span>Total (USD)</span>
-                  <span id="sandbox-order-total">$0,000.00</span>
-                </li>
-              </ul>
-              <div class="order-details-card__actions">
+            <aside id="order-details-card" class="order-details-card" aria-labelledby="order-details-title">
+              <h2 id="order-details-title" class="order-details-card__title order-details-title">
+                Order Details
+              </h2>
+              <div id="sandbox-order-details-mount" class="order-details-card__body"></div>
+              <div class="order-details-card__actions order-details-actions">
                 <modus-button
                   color="primary"
                   button-style="fill"
                   variant="filled"
                   size="medium"
-                  onclick="window.open('https://admin.trimble.com', '_blank', 'noopener,noreferrer')"
+                  data-destination="Navigates to Trimble Admin Console (Orders Page)"
                 >
                   View orders
                 </modus-button>
@@ -334,7 +343,7 @@
                     button-style="fill"
                     variant="filled"
                     size="medium"
-                    onclick="location.href='https://admin.trimble.com'"
+                    data-destination="Navigates to Trimble Admin Console ('My Products' Page)"
                   >
                     Get started
                   </modus-button>
@@ -351,7 +360,7 @@
                       button-style="fill"
                       variant="filled"
                       size="medium"
-                      onclick="location.href='https://admin.trimble.com'"
+                      data-destination="Navigates to Trimble Admin Console ('Products & Licenses' Page)"
                     >
                       Assign licenses to my team
                     </modus-button>
@@ -360,7 +369,7 @@
                       button-style="outline"
                       variant="outline"
                       size="medium"
-                      onclick="location.href='https://www.trimble.com/en/support'"
+                      data-destination="Navigates to Trimble Admin Console ('Getting Started' Page)"
                     >
                       Learn more
                     </modus-button>
@@ -380,20 +389,36 @@
                 <h3 class="setup-card__title">Need Help?</h3>
                 <ul class="setup-card__links">
                   <li>
-                    <a href="https://www.trimble.com/en/support">Contact Trimble Support</a>
+                    <a
+                      href="https://www.trimble.com/en/support"
+                      data-destination="Opens Trimble Support Portal in a new tab"
+                      >Contact Trimble Support</a
+                    >
                   </li>
                   <li>
-                    <a href="https://id.trimble.com">Trimble ID FAQ</a>
+                    <a
+                      href="https://id.trimble.com"
+                      data-destination="Opens Trimble Help Center ('Trimble ID FAQ')"
+                      >Trimble ID FAQ</a
+                    >
                   </li>
                 </ul>
                 <hr class="setup-card__divider" />
                 <p class="setup-card__quick-links-title">Quick Links</p>
                 <ul class="setup-card__links">
                   <li>
-                    <a href="https://id.trimble.com">Manage Your Profile</a>
+                    <a
+                      href="https://id.trimble.com"
+                      data-destination="Navigates to Trimble Admin Console (Profile Settings)"
+                      >Manage Your Profile</a
+                    >
                   </li>
                   <li>
-                    <a href="https://admin.trimble.com">View Order History</a>
+                    <a
+                      href="https://admin.trimble.com"
+                      data-destination="Navigates to Trimble Admin Console (Order History)"
+                      >View Order History</a
+                    >
                   </li>
                 </ul>
               </div>
@@ -423,6 +448,8 @@
               href="https://marketplace.trimble.com"
               target="_blank"
               rel="noopener noreferrer"
+              data-default-label="Browse Marketplace &rarr;"
+              data-destination="Navigates to Trimble Marketplace Homepage"
             >
               Browse Marketplace &rarr;
             </a>
@@ -450,11 +477,11 @@
                   ></div>
                 </div>
                 <div class="recommendation-card__body">
-                  <span class="card-eyebrow">Trimble Software</span>
-                  <h3 class="card-title">Explore Software &amp; Add-Ons</h3>
+                  <span class="card-eyebrow">EXTENSIONS</span>
+                  <h3 class="card-title">Extend your 3D models</h3>
                   <p class="card-description">
-                    Expand your operational workflows with specialized cloud solutions, seat expansion
-                    options, and premium modules.
+                    Customize your workflow with specialized tools and third-party extensions built for
+                    SketchUp.
                   </p>
                 </div>
                 <div class="recommendation-card__footer">
@@ -463,9 +490,10 @@
                     button-style="fill"
                     variant="filled"
                     size="medium"
-                    onclick="location.href='https://www.trimble.com/en/products/software'"
+                    aria-label="Explore extensions on the SketchUp Extension Warehouse"
+                    data-destination="Navigates to SketchUp Extension Warehouse"
                   >
-                    Browse software catalog
+                    Explore extensions
                   </modus-button>
                 </div>
               </div>
@@ -489,11 +517,11 @@
                   ></div>
                 </div>
                 <div class="recommendation-card__body">
-                  <span class="card-eyebrow">Trimble Marketplace</span>
-                  <h3 class="card-title">Discover 100+ Workflow Plugins</h3>
+                  <span class="card-eyebrow">SOFTWARE CATALOG</span>
+                  <h3 class="card-title">Connect your workflows</h3>
                   <p class="card-description">
-                    Browse certified third-party integrations, extensions, and workflow plugins designed
-                    to enhance your tools.
+                    Explore our connected portfolio of design, construction, and geospatial software
+                    solutions.
                   </p>
                 </div>
                 <div class="recommendation-card__footer">
@@ -502,9 +530,10 @@
                     button-style="fill"
                     variant="filled"
                     size="medium"
-                    onclick="window.open('https://marketplace.trimble.com', '_blank', 'noopener,noreferrer')"
+                    aria-label="View all software solutions in the Trimble Software Catalog"
+                    data-destination="Navigates to Software Product Listing Page (PLP)"
                   >
-                    Browse marketplace
+                    View all software
                   </modus-button>
                 </div>
               </div>
@@ -528,11 +557,11 @@
                   ></div>
                 </div>
                 <div class="recommendation-card__body">
-                  <span class="card-eyebrow">Trimble Learn</span>
-                  <h3 class="card-title">Master Your New Software</h3>
+                  <span class="card-eyebrow">TRIMBLE CREDITS</span>
+                  <h3 class="card-title">Power on-demand compute</h3>
                   <p class="card-description">
-                    Accelerate team onboarding with self-paced video tutorials, live webinars, and
-                    accredited certification tracks.
+                    Access flexible, prepaid credits to unlock on-demand cloud processing, rendering, and
+                    data services.
                   </p>
                 </div>
                 <div class="recommendation-card__footer">
@@ -541,9 +570,10 @@
                     button-style="fill"
                     variant="filled"
                     size="medium"
-                    onclick="location.href='https://learn.trimble.com'"
+                    aria-label="Learn more about purchasing and using Trimble Credits"
+                    data-destination="Navigates to Trimble Credits Product Detail Page (PDP)"
                   >
-                    Explore training courses
+                    Explore credits
                   </modus-button>
                 </div>
               </div>
@@ -603,6 +633,13 @@
         </nav>
       </div>
     </footer>
+    <div id="prototype-routing-toast" class="prototype-toast" role="status" aria-live="polite"></div>
+    <div
+      id="prototype-global-tooltip"
+      class="prototype-global-tooltip"
+      role="tooltip"
+      aria-hidden="true"
+    ></div>
     <script src="js/sandbox.js"></script>
   </body>
 </html>
