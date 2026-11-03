@@ -19,6 +19,47 @@
   var DESKTOP_GRID_COLUMNS = 'repeat(3, minmax(0, 1fr))';
   var OWNER_ROLES = ['account-owner', 'secondary-owner', 'license-admin'];
 
+  /** Stage 1 / 2 section visibility by purchase type (Stage 3 bypasses this matrix). */
+  var SECTION_VISIBILITY_MATRIX = {
+    'stage-1': {
+      'saas-paid': { section1: true, section2: true, section3: true },
+      'free-trial': { section1: true, section2: true, section3: false },
+      'auto-convert': { section1: true, section2: true, section3: false },
+      'trimble-credits': { section1: true, section2: true, section3: false },
+      'partial-term': { section1: true, section2: true, section3: true },
+    },
+    'stage-2': {
+      'saas-paid': { section1: true, section2: true, section3: true },
+      'free-trial': { section1: true, section2: true, section3: false },
+      'auto-convert': { section1: true, section2: true, section3: false },
+      'trimble-credits': { section1: true, section2: true, section3: true },
+      'partial-term': { section1: true, section2: true, section3: true },
+    },
+  };
+
+  var STAGE2_TRIMBLE_CREDITS_CARDS = [
+    {
+      id: 'stage2-credits-software-catalog',
+      eyebrow: 'Ecosystem discovery',
+      title: 'Trimble Software Catalog',
+      description:
+        'Explore cloud applications and desktop tools that utilize processing credits.',
+      buttonText: 'Explore software',
+      ariaLabel: 'Explore software in the Trimble Software Catalog',
+      destination: 'Navigates to Software Product Listing Page (PLP)',
+    },
+    {
+      id: 'stage2-credits-onboarding',
+      eyebrow: 'Product enablement',
+      title: 'Onboarding courses',
+      description:
+        'Master consumption management and workflows with on-demand Trimble Learn modules.',
+      buttonText: 'Explore courses',
+      ariaLabel: 'Explore onboarding courses on Trimble Learn',
+      destination: 'Navigates to Training Product Listing Page (PLP)',
+    },
+  ];
+
   var T1_PDP_DESTINATION = 'Navigates to Product Detail Page (PDP)';
   var T2_PDP_DESTINATION = 'Navigates to Marketplace Product Detail Page (PDP)';
   var T3_PDP_DESTINATION = 'Navigates to Course Detail Page (PDP)';
@@ -509,6 +550,20 @@
     return getResolvedDirectoryCards(state.purchase).map(directoryCardToContent);
   }
 
+  function isStage2TrimbleCreditsScenario(state) {
+    return (
+      normalizeStage(state.stage) === 'stage-2' &&
+      normalizePurchase(state.purchase) === 'trimble-credits'
+    );
+  }
+
+  function buildSection3DirectoryContentSet(state) {
+    if (isStage2TrimbleCreditsScenario(state)) {
+      return STAGE2_TRIMBLE_CREDITS_CARDS.map(directoryCardToContent);
+    }
+    return buildGenericDirectoryContentSet(state);
+  }
+
   var STAGE_EXPLANATIONS = {
     'stage-1': {
       title: 'STAGE 1: MVP SCOPE (BASELINE PRODUCTION)',
@@ -782,7 +837,7 @@
       }
 
       if (cardType === 'generic-plp') {
-        var genericSet = buildGenericDirectoryContentSet(state);
+        var genericSet = buildSection3DirectoryContentSet(state);
         var generic = genericSet[index];
         applyCardButtonDestination(btn, generic ? generic.destination : null);
         return;
@@ -985,13 +1040,114 @@
     }
   }
 
+  function applySection3LayoutMode(state) {
+    var cardGrid = document.getElementById('sandbox-upsell-grid');
+    if (!cardGrid) {
+      return;
+    }
+    var cards = getUpsellCards();
+    var fixedTwo =
+      isStage2TrimbleCreditsScenario(state) && isScenarioSection3Visible(state);
+
+    if (fixedTwo) {
+      cardGrid.classList.add('sandbox-upsell-grid--fixed-two');
+      cardGrid.style.gridTemplateColumns = DESKTOP_GRID_COLUMNS;
+      setCardDisplay(cards[0], true);
+      setCardDisplay(cards[1], true);
+      if (cards[2]) {
+        setCardDisplay(cards[2], false);
+        cards[2].setAttribute('aria-hidden', 'true');
+        cards[2].setAttribute('inert', '');
+      }
+      return;
+    }
+
+    cardGrid.classList.remove('sandbox-upsell-grid--fixed-two');
+    cards.forEach(function (card) {
+      card.removeAttribute('aria-hidden');
+      card.removeAttribute('inert');
+    });
+  }
+
+  function applyCardTypeControlForScenario(state) {
+    var cardTypeSelect = document.getElementById('sandbox-card-type-select');
+    var cardTypeGroup = cardTypeSelect && cardTypeSelect.closest('.sandbox-control-group');
+    if (!cardTypeSelect) {
+      return;
+    }
+
+    if (isStage2TrimbleCreditsScenario(state)) {
+      state.cardType = 'generic-plp';
+      cardTypeSelect.value = 'generic-plp';
+      cardTypeSelect.disabled = true;
+      cardTypeSelect.setAttribute('aria-disabled', 'true');
+      cardTypeSelect.title = 'Locked to Directory Gateways for Trimble Credits in Stage 2';
+      if (cardTypeGroup) {
+        cardTypeGroup.classList.add('sandbox-control-disabled');
+      }
+      setCardTypeOptionStates(cardTypeSelect, true);
+      return;
+    }
+
+    cardTypeSelect.disabled = false;
+    cardTypeSelect.removeAttribute('aria-disabled');
+    cardTypeSelect.title = '';
+    if (cardTypeGroup) {
+      cardTypeGroup.classList.remove('sandbox-control-disabled');
+    }
+
+    if (normalizeStage(state.stage) === 'stage-1') {
+      state.cardType = 'generic-plp';
+      cardTypeSelect.value = 'generic-plp';
+      setCardTypeOptionStates(cardTypeSelect, true);
+      return;
+    }
+
+    setCardTypeOptionStates(cardTypeSelect, false);
+    if (normalizeStage(state.stage) === 'stage-2' && state.cardType === 'generic-plp') {
+      state.cardType = 'product-pdp';
+      cardTypeSelect.value = 'product-pdp';
+    }
+  }
+
+  function applyScenarioPurchaseMode(state, silent) {
+    if (normalizeStage(state.stage) === 'stage-3') {
+      applySection3LayoutMode(state);
+      applyCardTypeControlForScenario(state);
+      return;
+    }
+
+    applyCardTypeControlForScenario(state);
+    applySection3LayoutMode(state);
+
+    if (!isScenarioSection3Visible(state)) {
+      return;
+    }
+
+    renderSection3Cards(state, false);
+
+    if (!silent && isStage2TrimbleCreditsScenario(state)) {
+      announce(
+        'Scenario updated: Stage 2 Enhanced with Trimble Credits active. Card type locked to Directory Gateways with 2 fixed cards displayed.'
+      );
+    }
+  }
+
   function renderSection3Cards(state, announceGenericCards) {
     var cardType = normalizeCardType(state.cardType);
     var stage = normalizeStage(state.stage);
 
+    if (isStage2TrimbleCreditsScenario(state) && isScenarioSection3Visible(state)) {
+      setMatrixControlLocked(true);
+      populateCards(buildSection3DirectoryContentSet(state));
+      configureCardButtons(state);
+      applySection3LayoutMode(state);
+      return;
+    }
+
     if (cardType === 'generic-plp') {
       setMatrixControlLocked(true);
-      populateCards(buildGenericDirectoryContentSet(state));
+      populateCards(buildSection3DirectoryContentSet(state));
       if (announceGenericCards) {
         announce(
           'Generic directory cards updated: displaying top 3 recommendations based on purchase context.'
@@ -1009,6 +1165,103 @@
     configureCardButtons(state);
   }
 
+  function resolveScenarioSectionVisibility(stage, purchase) {
+    var stageKey = normalizeStage(stage);
+    var purchaseKey = normalizePurchase(purchase);
+
+    if (stageKey === 'stage-3') {
+      return {
+        section1: true,
+        section2: true,
+        section3: true,
+        bypassMatrix: true,
+      };
+    }
+
+    var stageMap = SECTION_VISIBILITY_MATRIX[stageKey];
+    if (!stageMap) {
+      return {
+        section1: true,
+        section2: true,
+        section3: true,
+        bypassMatrix: false,
+      };
+    }
+
+    var row = stageMap[purchaseKey] || {
+      section1: true,
+      section2: true,
+      section3: true,
+    };
+
+    return {
+      section1: row.section1 !== false,
+      section2: row.section2 !== false,
+      section3: row.section3 !== false,
+      bypassMatrix: false,
+    };
+  }
+
+  function isScenarioSection3Visible(state) {
+    return resolveScenarioSectionVisibility(state.stage, state.purchase).section3;
+  }
+
+  function announceScenarioSectionVisibility(state, visibility) {
+    var stage = normalizeStage(state.stage);
+    if (visibility.bypassMatrix) {
+      return;
+    }
+
+    var purchaseSelect = document.getElementById('sandbox-purchase-select');
+    var purchaseLabel = purchaseSelect
+      ? getSelectedOptionLabel(purchaseSelect)
+      : normalizePurchase(state.purchase);
+
+    if (!visibility.section3) {
+      announce(
+        'Scenario updated: ' +
+          purchaseLabel +
+          ' view active. Section 3 directory gateways hidden for ' +
+          (stage === 'stage-1' ? 'Stage 1 MVP' : 'Stage 2 Enhanced') +
+          '.'
+      );
+      return;
+    }
+
+    if (
+      stage === 'stage-2' &&
+      normalizePurchase(state.purchase) === 'trimble-credits' &&
+      visibility.section3
+    ) {
+      return;
+    }
+  }
+
+  function applyScenarioSectionVisibility(state, silent) {
+    var visibility = resolveScenarioSectionVisibility(state.stage, state.purchase);
+    var section1 = document.getElementById('order-confirmation-section-1');
+    var section2 = document.getElementById('order-confirmation-section-2');
+    var section3 = document.getElementById('order-confirmation-section-3');
+
+    if (section1) {
+      section1.hidden = !visibility.section1;
+    }
+    if (section2) {
+      section2.hidden = !visibility.section2;
+    }
+    if (section3) {
+      section3.hidden = !visibility.section3;
+      if (!visibility.section3) {
+        section3.style.removeProperty('display');
+      }
+    }
+
+    if (!silent) {
+      announceScenarioSectionVisibility(state, visibility);
+    }
+    applyScenarioPurchaseMode(state, silent);
+  }
+
   function applyLinkToggle(value) {
     var link = document.getElementById('section-3-marketplace-link');
     if (!link) {
@@ -1023,11 +1276,25 @@
     link.style.setProperty('display', 'inline-flex', 'important');
   }
 
-  function applyUpsellState(value, silent) {
-    var section3Container = document.getElementById('section-3-upsell');
+  function applyUpsellState(value, silent, state) {
+    var section3Container = document.getElementById('order-confirmation-section-3');
     var cardGrid = document.getElementById('sandbox-upsell-grid');
 
     if (!section3Container || !cardGrid) {
+      return;
+    }
+
+    if (state && !isScenarioSection3Visible(state)) {
+      section3Container.hidden = true;
+      section3Container.style.removeProperty('display');
+      return;
+    }
+
+    section3Container.hidden = false;
+
+    if (state && isStage2TrimbleCreditsScenario(state)) {
+      section3Container.style.removeProperty('display');
+      applySection3LayoutMode(state);
       return;
     }
 
@@ -1422,7 +1689,8 @@
 
     applyStageController(state, true);
     setStageNoteBodyExpanded(state.stageNoteExpanded);
-    applyUpsellState(state.upsell, true);
+    applyScenarioSectionVisibility(state, true);
+    applyUpsellState(state.upsell, true, state);
     applyRoleState(roleSelect.value);
     applyReceiptContext(state, true);
     applyCollapsed(Boolean(state.collapsed), bar, reopenBtn);
@@ -1449,17 +1717,16 @@
       purchaseSelect.value = state.purchase;
       syncPromoWithPurchase(state, promoSelect);
       applyReceiptContext(state, true);
-      if (normalizeCardType(state.cardType) === 'generic-plp') {
-        renderSection3Cards(state, true);
-      }
       if (normalizeStage(state.stage) === 'stage-1') {
         updateStageDevNote(state.stage, state.purchase);
       }
+      applyScenarioSectionVisibility(state, false);
+      applyUpsellState(state.upsell, true, state);
       if (state.purchase === 'partial-term') {
         announce(
           'Purchase type set to SaaS Partial Term Adjustment. Promo codes disabled for proration adjustments.'
         );
-      } else {
+      } else if (normalizeStage(state.stage) === 'stage-3') {
         announce('Purchase type switched to: ' + getSelectedOptionLabel(purchaseSelect));
       }
       saveState(state);
@@ -1485,13 +1752,15 @@
       state.stage = normalizeStage(stageSelect.value);
       stageSelect.value = state.stage;
       applyStageController(state, false);
+      applyScenarioSectionVisibility(state, false);
+      applyUpsellState(state.upsell, true, state);
       saveState(state);
     });
 
     upsellSelect.addEventListener('change', function () {
       state.upsell = normalizeUpsell(upsellSelect.value);
       upsellSelect.value = state.upsell;
-      applyUpsellState(state.upsell, false);
+      applyUpsellState(state.upsell, false, state);
       if (normalizeCardType(state.cardType) === 'generic-plp') {
         renderSection3Cards(state);
       }

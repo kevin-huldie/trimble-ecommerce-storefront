@@ -318,18 +318,46 @@
 }
 
 /* Section 3 — fixed three-column tracks (card width unchanged when fewer cards show) */
-#section-3-upsell .card-grid {
+#order-confirmation-section-3 .card-grid {
   display: grid !important;
   grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
   gap: 24px !important;
   align-items: stretch !important;
 }
 
-#section-3-upsell .card-grid > modus-card.recommendation-card {
+#order-confirmation-section-3 .card-grid > modus-card.recommendation-card {
   min-width: 0;
   max-width: 100%;
   width: 100%;
   box-sizing: border-box;
+}
+
+#sandbox-upsell-grid.sandbox-upsell-grid--fixed-two {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+#sandbox-upsell-grid.sandbox-upsell-grid--fixed-two
+  > modus-card.recommendation-card[data-sandbox-upsell-card='1'] {
+  grid-column: 1;
+}
+
+#sandbox-upsell-grid.sandbox-upsell-grid--fixed-two
+  > modus-card.recommendation-card[data-sandbox-upsell-card='2'] {
+  grid-column: 2;
+}
+
+#sandbox-upsell-grid.sandbox-upsell-grid--fixed-two
+  > modus-card.recommendation-card[data-sandbox-upsell-card='3'] {
+  display: none !important;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+@media (min-width: 768px) {
+  #order-confirmation-section-3 .col-md-4 {
+    width: 100%;
+    max-width: 100%;
+  }
 }
 
 .card-grid-3--equal-height > modus-card {
