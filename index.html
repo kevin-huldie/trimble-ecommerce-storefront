@@ -33,18 +33,17 @@
         <span class="sandbox-brand">Trimble Prototype Sandbox</span>
 
         <div class="sandbox-control-group sandbox-control-inline">
-          <label for="sandbox-feature-select">Feature Scope:</label>
-          <select
-            id="sandbox-feature-select"
-            class="sandbox-select sandbox-select-feature"
-            disabled
-            aria-disabled="true"
+          <label for="sandbox-feature-display">Feature Scope:</label>
+          <span
+            id="sandbox-feature-display"
+            class="sandbox-select sandbox-select-feature sandbox-feature-readonly"
+            role="text"
+            aria-readonly="true"
             title="DXPBK-1321 is currently active. Additional roadmap features will unlock here."
           >
-            <option value="dxpbk-1321" selected>
-              DXPBK-1321 | Checkout Upsell &amp; Revenue Optimization
-            </option>
-          </select>
+            DXPBK-1321 | Checkout Upsell &amp; Revenue Optimization
+          </span>
+          <input type="hidden" id="sandbox-feature-select" name="sandbox-feature-select" value="dxpbk-1321" />
         </div>
 
         <div class="sandbox-control-group sandbox-control-inline">

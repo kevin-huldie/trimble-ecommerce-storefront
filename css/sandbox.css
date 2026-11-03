@@ -181,12 +181,14 @@
   white-space: nowrap;
 }
 
-.sandbox-select-feature[aria-disabled='true'] {
-  background-color: #16181a !important;
-  color: #90939f !important;
-  cursor: not-allowed !important;
-  pointer-events: none !important;
-  border-color: #383e45 !important;
+.sandbox-feature-readonly {
+  display: inline-block;
+  cursor: default !important;
+  pointer-events: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  box-sizing: border-box;
 }
 
 #sandbox-matrix-select[aria-disabled='true'],
