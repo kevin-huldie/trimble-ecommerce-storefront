@@ -10,7 +10,12 @@
     '1-card': '1',
     '0-cards': '0',
   };
-  var VALID_CARD_TYPES = ['generic-plp', 'product-pdp'];
+  var CARD_TYPE_DIRECTORY = 'directory-gateways';
+  var CARD_TYPE_PRODUCT = 'product-pdp';
+  var VALID_CARD_TYPES = [CARD_TYPE_DIRECTORY, CARD_TYPE_PRODUCT];
+  var LEGACY_CARD_TYPE_VALUES = {
+    'generic-plp': CARD_TYPE_DIRECTORY,
+  };
   var VALID_STAGES = ['stage-1', 'stage-2', 'stage-3'];
   var VALID_MATRIX = [
     'optimal',
@@ -43,10 +48,11 @@
     },
   };
 
-  var STAGE2_CREDITS_CARD_TYPE_LOCK_TITLE =
+  var STAGE2_CREDITS_UTILITY_LOCK_TITLE =
     'Locked to 2 Directory Gateway cards for Trimble Credits in Stage 2';
-  var STAGE2_CREDITS_VISIBLE_CARDS_LOCK_TITLE =
-    'Locked to 2 cards for Trimble Credits in Stage 2';
+
+  var SECTION3_HIDDEN_CONTROL_TITLE =
+    'Control unavailable because Section 3 is hidden for this scenario';
 
   /** Visible upsell count saved before Stage 2 + Trimble Credits forces 2 cards. */
   var upsellCountBeforeStage2CreditsLock = null;
@@ -212,6 +218,11 @@
     'trimble-credits',
     'partial-term',
   ];
+  var LEGACY_PURCHASE_VALUES = {
+    'saas-subscription': 'saas-paid',
+    'auto-convert-trial': 'auto-convert',
+    'saas-partial-term-adjustment': 'partial-term',
+  };
   var VALID_PROMO = ['applied', 'none'];
   var PURCHASE_ALLOWS_PROMO = 'saas-paid';
 
@@ -350,7 +361,7 @@
     promo: 'applied',
     upsell: '3',
     stage: 'stage-1',
-    cardType: 'generic-plp',
+    cardType: CARD_TYPE_DIRECTORY,
     matrix: 'optimal',
     linkToggle: 'show',
     collapsed: false,
@@ -389,10 +400,17 @@
   }
 
   function normalizeCardType(value) {
+    if (value && LEGACY_CARD_TYPE_VALUES[value]) {
+      value = LEGACY_CARD_TYPE_VALUES[value];
+    }
     if (VALID_CARD_TYPES.indexOf(value) === -1) {
-      return 'generic-plp';
+      return CARD_TYPE_DIRECTORY;
     }
     return value;
+  }
+
+  function isDirectoryGatewaysCardType(cardType) {
+    return normalizeCardType(cardType) === CARD_TYPE_DIRECTORY;
   }
 
   function normalizeStage(value) {
@@ -586,6 +604,43 @@
       document.getElementById('sandbox-visible-cards') ||
       document.getElementById('sandbox-upsell-select')
     );
+  }
+
+  function getSandboxUpsellTextLinkSelect() {
+    return (
+      document.getElementById('sandbox-upsell-text-link') ||
+      document.getElementById('sandbox-link-toggle')
+    );
+  }
+
+  function getSandboxMatrixMixSelect() {
+    return (
+      document.getElementById('sandbox-matrix-mix') ||
+      document.getElementById('sandbox-matrix-select')
+    );
+  }
+
+  function setSandboxSelectLocked(selectEl, groupEl, locked, title) {
+    if (!selectEl) {
+      return;
+    }
+    if (locked) {
+      selectEl.disabled = true;
+      selectEl.setAttribute('aria-disabled', 'true');
+      if (title) {
+        selectEl.title = title;
+      }
+      if (groupEl) {
+        groupEl.classList.add('sandbox-control-disabled');
+      }
+    } else {
+      selectEl.disabled = false;
+      selectEl.removeAttribute('aria-disabled');
+      selectEl.title = '';
+      if (groupEl) {
+        groupEl.classList.remove('sandbox-control-disabled');
+      }
+    }
   }
 
   function buildSection3DirectoryContentSet(state) {
@@ -867,7 +922,7 @@
         }
       }
 
-      if (cardType === 'generic-plp') {
+      if (isDirectoryGatewaysCardType(cardType)) {
         var genericSet = buildSection3DirectoryContentSet(state);
         var generic = genericSet[index];
         applyCardButtonDestination(btn, generic ? generic.destination : null);
@@ -887,9 +942,9 @@
     var stage = normalizeStage(state.stage);
     updateStageDevNote(stage);
     var cardTypeSelect = getSandboxCardTypeSelect();
-    var linkToggle = document.getElementById('sandbox-link-toggle');
+    var linkToggle = getSandboxUpsellTextLinkSelect();
     var linkToggleGroup = document.getElementById('sandbox-link-toggle-group');
-    var matrixSelect = document.getElementById('sandbox-matrix-select');
+    var matrixSelect = getSandboxMatrixMixSelect();
 
     if (stage === 'stage-1') {
       state.linkToggle = 'hide';
@@ -898,9 +953,9 @@
       }
       setControlGroupLocked(linkToggle, linkToggleGroup, true);
 
-      state.cardType = 'generic-plp';
+      state.cardType = CARD_TYPE_DIRECTORY;
       if (cardTypeSelect) {
-        cardTypeSelect.value = 'generic-plp';
+        cardTypeSelect.value = CARD_TYPE_DIRECTORY;
       }
       setCardTypeOptionStates(cardTypeSelect, true);
 
@@ -1056,19 +1111,71 @@
 
   function setMatrixControlLocked(locked) {
     var matrixGroup = document.getElementById('sandbox-matrix-group');
-    var matrixSelect = document.getElementById('sandbox-matrix-select');
+    var matrixSelect = getSandboxMatrixMixSelect();
 
     if (!matrixGroup || !matrixSelect) {
       return;
     }
 
     if (locked) {
+      matrixSelect.disabled = true;
       matrixSelect.setAttribute('aria-disabled', 'true');
       matrixGroup.classList.add('sandbox-control-disabled');
     } else {
+      matrixSelect.disabled = false;
       matrixSelect.removeAttribute('aria-disabled');
       matrixGroup.classList.remove('sandbox-control-disabled');
     }
+  }
+
+  function applyLinkAndMatrixControlsForStage(state) {
+    if (!isScenarioSection3Visible(state)) {
+      return;
+    }
+
+    var stage = normalizeStage(state.stage);
+    var linkToggle = getSandboxUpsellTextLinkSelect();
+    var linkToggleGroup = document.getElementById('sandbox-link-toggle-group');
+    var cardType = normalizeCardType(state.cardType);
+    var matrixLocked =
+      stage === 'stage-1' ||
+      isDirectoryGatewaysCardType(cardType) ||
+      isStage2TrimbleCreditsScenario(state);
+
+    if (stage === 'stage-1') {
+      setSandboxSelectLocked(linkToggle, linkToggleGroup, true, '');
+    } else {
+      setSandboxSelectLocked(linkToggle, linkToggleGroup, false, '');
+    }
+
+    setMatrixControlLocked(matrixLocked);
+  }
+
+  function applySection3SubordinateControls(state) {
+    var linkSelect = getSandboxUpsellTextLinkSelect();
+    var linkGroup = document.getElementById('sandbox-link-toggle-group');
+    var cardTypeSelect = getSandboxCardTypeSelect();
+    var cardTypeGroup = cardTypeSelect && cardTypeSelect.closest('.sandbox-control-group');
+    var matrixSelect = getSandboxMatrixMixSelect();
+    var matrixGroup = document.getElementById('sandbox-matrix-group');
+    var upsellSelect = getSandboxVisibleCardsSelect();
+    var upsellGroup = upsellSelect && upsellSelect.closest('.sandbox-control-group');
+
+    if (!isScenarioSection3Visible(state)) {
+      setSandboxSelectLocked(linkSelect, linkGroup, true, SECTION3_HIDDEN_CONTROL_TITLE);
+      setSandboxSelectLocked(cardTypeSelect, cardTypeGroup, true, SECTION3_HIDDEN_CONTROL_TITLE);
+      setSandboxSelectLocked(matrixSelect, matrixGroup, true, SECTION3_HIDDEN_CONTROL_TITLE);
+      setSandboxSelectLocked(upsellSelect, upsellGroup, true, SECTION3_HIDDEN_CONTROL_TITLE);
+      return;
+    }
+
+    setSandboxSelectLocked(linkSelect, linkGroup, false, '');
+    setSandboxSelectLocked(cardTypeSelect, cardTypeGroup, false, '');
+    setSandboxSelectLocked(matrixSelect, matrixGroup, false, '');
+    setSandboxSelectLocked(upsellSelect, upsellGroup, false, '');
+
+    applyCardTypeControlForScenario(state);
+    applyLinkAndMatrixControlsForStage(state);
   }
 
   function applySection3LayoutMode(state) {
@@ -1108,11 +1215,11 @@
 
     if (isStage2TrimbleCreditsScenario(state)) {
       if (cardTypeSelect) {
-        state.cardType = 'generic-plp';
-        cardTypeSelect.value = 'generic-plp';
+        state.cardType = CARD_TYPE_DIRECTORY;
+        cardTypeSelect.value = CARD_TYPE_DIRECTORY;
         cardTypeSelect.disabled = true;
         cardTypeSelect.setAttribute('aria-disabled', 'true');
-        cardTypeSelect.title = STAGE2_CREDITS_CARD_TYPE_LOCK_TITLE;
+        cardTypeSelect.title = STAGE2_CREDITS_UTILITY_LOCK_TITLE;
         if (cardTypeGroup) {
           cardTypeGroup.classList.add('sandbox-control-disabled');
         }
@@ -1125,7 +1232,7 @@
         upsellSelect.value = '2';
         upsellSelect.disabled = true;
         upsellSelect.setAttribute('aria-disabled', 'true');
-        upsellSelect.title = STAGE2_CREDITS_VISIBLE_CARDS_LOCK_TITLE;
+        upsellSelect.title = STAGE2_CREDITS_UTILITY_LOCK_TITLE;
         if (upsellGroup) {
           upsellGroup.classList.add('sandbox-control-disabled');
         }
@@ -1160,27 +1267,28 @@
     }
 
     if (normalizeStage(state.stage) === 'stage-1') {
-      state.cardType = 'generic-plp';
-      cardTypeSelect.value = 'generic-plp';
+      state.cardType = CARD_TYPE_DIRECTORY;
+      cardTypeSelect.value = CARD_TYPE_DIRECTORY;
       setCardTypeOptionStates(cardTypeSelect, true);
       return;
     }
 
     setCardTypeOptionStates(cardTypeSelect, false);
-    if (normalizeStage(state.stage) === 'stage-2' && state.cardType === 'generic-plp') {
-      state.cardType = 'product-pdp';
-      cardTypeSelect.value = 'product-pdp';
+    if (
+      normalizeStage(state.stage) === 'stage-2' &&
+      isDirectoryGatewaysCardType(state.cardType)
+    ) {
+      state.cardType = CARD_TYPE_PRODUCT;
+      cardTypeSelect.value = CARD_TYPE_PRODUCT;
     }
   }
 
   function applyScenarioPurchaseMode(state, silent) {
     if (normalizeStage(state.stage) === 'stage-3') {
       applySection3LayoutMode(state);
-      applyCardTypeControlForScenario(state);
       return;
     }
 
-    applyCardTypeControlForScenario(state);
     applySection3LayoutMode(state);
 
     if (!isScenarioSection3Visible(state)) {
@@ -1208,7 +1316,7 @@
       return;
     }
 
-    if (cardType === 'generic-plp') {
+    if (isDirectoryGatewaysCardType(cardType)) {
       setMatrixControlLocked(true);
       populateCards(buildSection3DirectoryContentSet(state));
       if (announceGenericCards) {
@@ -1284,9 +1392,7 @@
       announce(
         'Scenario updated: ' +
           purchaseLabel +
-          ' view active. Section 3 directory gateways hidden for ' +
-          (stage === 'stage-1' ? 'Stage 1 MVP' : 'Stage 2 Enhanced') +
-          '.'
+          ' active. Section 3 upsells hidden; subordinate sandbox controls disabled.'
       );
       return;
     }
@@ -1322,6 +1428,7 @@
     if (!silent) {
       announceScenarioSectionVisibility(state, visibility);
     }
+    applySection3SubordinateControls(state);
     applyScenarioPurchaseMode(state, silent);
   }
 
@@ -1434,6 +1541,9 @@
   }
 
   function normalizePurchase(value) {
+    if (value && LEGACY_PURCHASE_VALUES[value]) {
+      value = LEGACY_PURCHASE_VALUES[value];
+    }
     if (VALID_PURCHASE.indexOf(value) === -1) {
       return 'saas-paid';
     }
@@ -1488,7 +1598,7 @@
     }
   }
 
-  var RECEIPT_HEADING_DEFAULT = 'Thank you for placing your order.';
+  var RECEIPT_HEADING_DEFAULT = 'Thank you for your order.';
   var RECEIPT_HEADING_FREE_TRIAL = 'Your trial is active!';
   var RECEIPT_ORDER_NUMBER_HTML = 'Order Number: <strong>000000</strong>';
   var RECEIPT_FREE_TRIAL_ACTIVATION_LINE =
@@ -1707,8 +1817,8 @@
     var promoSelect = document.getElementById('sandbox-promo-select');
     var upsellSelect = getSandboxVisibleCardsSelect();
     var cardTypeSelect = getSandboxCardTypeSelect();
-    var matrixSelect = document.getElementById('sandbox-matrix-select');
-    var linkToggle = document.getElementById('sandbox-link-toggle');
+    var matrixSelect = getSandboxMatrixMixSelect();
+    var linkToggle = getSandboxUpsellTextLinkSelect();
     var stageSelect = document.getElementById('sandbox-stage-select');
 
     if (
@@ -1732,6 +1842,7 @@
     state.feature = ACTIVE_FEATURE;
     state.upsell = normalizeUpsell(state.upsell);
     state.stage = normalizeStage(state.stage);
+    state.cardType = normalizeCardType(state.cardType || defaults.cardType);
     state.matrix = normalizeMatrix(state.matrix);
     state.linkToggle = state.linkToggle === 'hide' ? 'hide' : 'show';
     if (state.stageNoteExpanded === undefined) {
@@ -1746,6 +1857,7 @@
     purchaseSelect.value = state.purchase;
     syncPromoWithPurchase(state, promoSelect);
     upsellSelect.value = state.upsell;
+    cardTypeSelect.value = state.cardType;
     matrixSelect.value = state.matrix;
     linkToggle.value = state.linkToggle;
     stageSelect.value = state.stage;
@@ -1822,6 +1934,7 @@
 
     upsellSelect.addEventListener('change', function () {
       if (
+        !isScenarioSection3Visible(state) ||
         upsellSelect.disabled ||
         upsellSelect.getAttribute('aria-disabled') === 'true' ||
         isStage2TrimbleCreditsScenario(state)
@@ -1831,7 +1944,7 @@
       state.upsell = normalizeUpsell(upsellSelect.value);
       upsellSelect.value = state.upsell;
       applyUpsellState(state.upsell, false, state);
-      if (normalizeCardType(state.cardType) === 'generic-plp') {
+      if (isDirectoryGatewaysCardType(state.cardType)) {
         renderSection3Cards(state);
       }
       saveState(state);
@@ -1839,6 +1952,7 @@
 
     cardTypeSelect.addEventListener('change', function () {
       if (
+        !isScenarioSection3Visible(state) ||
         cardTypeSelect.disabled ||
         cardTypeSelect.getAttribute('aria-disabled') === 'true' ||
         isStage2TrimbleCreditsScenario(state)
@@ -1846,15 +1960,15 @@
         return;
       }
       if (normalizeStage(state.stage) === 'stage-1') {
-        cardTypeSelect.value = 'generic-plp';
-        state.cardType = 'generic-plp';
+        cardTypeSelect.value = CARD_TYPE_DIRECTORY;
+        state.cardType = CARD_TYPE_DIRECTORY;
         saveState(state);
         return;
       }
       state.cardType = normalizeCardType(cardTypeSelect.value);
       cardTypeSelect.value = state.cardType;
       renderSection3Cards(state);
-      if (state.cardType === 'generic-plp') {
+      if (isDirectoryGatewaysCardType(state.cardType)) {
         announce(
           'Card type set to Directory Gateways: displaying broad catalog discovery cards.'
         );
@@ -1867,7 +1981,11 @@
     });
 
     matrixSelect.addEventListener('change', function () {
-      if (matrixSelect.getAttribute('aria-disabled') === 'true') {
+      if (
+        !isScenarioSection3Visible(state) ||
+        matrixSelect.disabled ||
+        matrixSelect.getAttribute('aria-disabled') === 'true'
+      ) {
         return;
       }
       state.matrix = normalizeMatrix(matrixSelect.value);
@@ -1879,7 +1997,11 @@
     });
 
     linkToggle.addEventListener('change', function () {
-      if (linkToggle.disabled || linkToggle.getAttribute('aria-disabled') === 'true') {
+      if (
+        !isScenarioSection3Visible(state) ||
+        linkToggle.disabled ||
+        linkToggle.getAttribute('aria-disabled') === 'true'
+      ) {
         return;
       }
       state.linkToggle = linkToggle.value === 'hide' ? 'hide' : 'show';
