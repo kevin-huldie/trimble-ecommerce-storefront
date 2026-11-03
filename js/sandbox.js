@@ -3,7 +3,13 @@
 
   var STORAGE_KEY = 'trimble-prototype-sandbox';
   var ACTIVE_FEATURE = 'dxpbk-1321';
-  var VALID_UPSELL = ['3-cards', '2-cards', '1-card', '0-cards'];
+  var VALID_UPSELL = ['3', '2', '1', '0'];
+  var LEGACY_UPSELL_VALUES = {
+    '3-cards': '3',
+    '2-cards': '2',
+    '1-card': '1',
+    '0-cards': '0',
+  };
   var VALID_CARD_TYPES = ['generic-plp', 'product-pdp'];
   var VALID_STAGES = ['stage-1', 'stage-2', 'stage-3'];
   var VALID_MATRIX = [
@@ -37,8 +43,13 @@
     },
   };
 
-  var STAGE2_CREDITS_UTILITY_LOCK_TITLE =
+  var STAGE2_CREDITS_CARD_TYPE_LOCK_TITLE =
     'Locked to 2 Directory Gateway cards for Trimble Credits in Stage 2';
+  var STAGE2_CREDITS_VISIBLE_CARDS_LOCK_TITLE =
+    'Locked to 2 cards for Trimble Credits in Stage 2';
+
+  /** Visible upsell count saved before Stage 2 + Trimble Credits forces 2 cards. */
+  var upsellCountBeforeStage2CreditsLock = null;
 
   var STAGE2_TRIMBLE_CREDITS_CARDS = [
     {
@@ -337,7 +348,7 @@
     role: 'account-owner',
     purchase: 'saas-paid',
     promo: 'applied',
-    upsell: '3-cards',
+    upsell: '3',
     stage: 'stage-1',
     cardType: 'generic-plp',
     matrix: 'optimal',
@@ -368,8 +379,11 @@
   }
 
   function normalizeUpsell(value) {
+    if (value && LEGACY_UPSELL_VALUES[value]) {
+      value = LEGACY_UPSELL_VALUES[value];
+    }
     if (VALID_UPSELL.indexOf(value) === -1) {
-      return '3-cards';
+      return '3';
     }
     return value;
   }
@@ -537,13 +551,13 @@
 
   function upsellModeToVisibleCount(upsellMode) {
     var mode = normalizeUpsell(upsellMode);
-    if (mode === '0-cards') {
+    if (mode === '0') {
       return 0;
     }
-    if (mode === '1-card') {
+    if (mode === '1') {
       return 1;
     }
-    if (mode === '2-cards') {
+    if (mode === '2') {
       return 2;
     }
     return 3;
@@ -1098,24 +1112,30 @@
         cardTypeSelect.value = 'generic-plp';
         cardTypeSelect.disabled = true;
         cardTypeSelect.setAttribute('aria-disabled', 'true');
-        cardTypeSelect.title = STAGE2_CREDITS_UTILITY_LOCK_TITLE;
+        cardTypeSelect.title = STAGE2_CREDITS_CARD_TYPE_LOCK_TITLE;
         if (cardTypeGroup) {
           cardTypeGroup.classList.add('sandbox-control-disabled');
         }
         setCardTypeOptionStates(cardTypeSelect, true);
       }
 
-      state.upsell = '2-cards';
+      upsellCountBeforeStage2CreditsLock = normalizeUpsell(state.upsell);
+      state.upsell = '2';
       if (upsellSelect) {
-        upsellSelect.value = '2-cards';
+        upsellSelect.value = '2';
         upsellSelect.disabled = true;
         upsellSelect.setAttribute('aria-disabled', 'true');
-        upsellSelect.title = STAGE2_CREDITS_UTILITY_LOCK_TITLE;
+        upsellSelect.title = STAGE2_CREDITS_VISIBLE_CARDS_LOCK_TITLE;
         if (upsellGroup) {
           upsellGroup.classList.add('sandbox-control-disabled');
         }
       }
       return;
+    }
+
+    if (upsellCountBeforeStage2CreditsLock !== null) {
+      state.upsell = upsellCountBeforeStage2CreditsLock;
+      upsellCountBeforeStage2CreditsLock = null;
     }
 
     if (upsellSelect) {
@@ -1344,7 +1364,7 @@
     var mode = normalizeUpsell(value);
     var cards = getUpsellCards();
 
-    if (mode === '0-cards') {
+    if (mode === '0') {
       section3Container.style.setProperty('display', 'none', 'important');
       if (!silent) {
         announce('Recommended add-ons section hidden');
@@ -1355,7 +1375,7 @@
     section3Container.style.removeProperty('display');
     cardGrid.style.gridTemplateColumns = DESKTOP_GRID_COLUMNS;
 
-    if (mode === '3-cards') {
+    if (mode === '3') {
       setCardDisplay(cards[0], true);
       setCardDisplay(cards[1], true);
       setCardDisplay(cards[2], true);
@@ -1365,7 +1385,7 @@
       return;
     }
 
-    if (mode === '2-cards') {
+    if (mode === '2') {
       setCardDisplay(cards[0], true);
       setCardDisplay(cards[1], true);
       setCardDisplay(cards[2], false);
@@ -1375,7 +1395,7 @@
       return;
     }
 
-    if (mode === '1-card') {
+    if (mode === '1') {
       setCardDisplay(cards[0], true);
       setCardDisplay(cards[1], false);
       setCardDisplay(cards[2], false);
