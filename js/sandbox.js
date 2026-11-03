@@ -37,6 +37,9 @@
     },
   };
 
+  var STAGE2_CREDITS_UTILITY_LOCK_TITLE =
+    'Locked to 2 Directory Gateway cards for Trimble Credits in Stage 2';
+
   var STAGE2_TRIMBLE_CREDITS_CARDS = [
     {
       id: 'stage2-credits-software-catalog',
@@ -557,6 +560,20 @@
     );
   }
 
+  function getSandboxCardTypeSelect() {
+    return (
+      document.getElementById('sandbox-card-type') ||
+      document.getElementById('sandbox-card-type-select')
+    );
+  }
+
+  function getSandboxVisibleCardsSelect() {
+    return (
+      document.getElementById('sandbox-visible-cards') ||
+      document.getElementById('sandbox-upsell-select')
+    );
+  }
+
   function buildSection3DirectoryContentSet(state) {
     if (isStage2TrimbleCreditsScenario(state)) {
       return STAGE2_TRIMBLE_CREDITS_CARDS.map(directoryCardToContent);
@@ -855,7 +872,7 @@
   function applyStageController(state, silent) {
     var stage = normalizeStage(state.stage);
     updateStageDevNote(stage);
-    var cardTypeSelect = document.getElementById('sandbox-card-type-select');
+    var cardTypeSelect = getSandboxCardTypeSelect();
     var linkToggle = document.getElementById('sandbox-link-toggle');
     var linkToggleGroup = document.getElementById('sandbox-link-toggle-group');
     var matrixSelect = document.getElementById('sandbox-matrix-select');
@@ -1070,22 +1087,48 @@
   }
 
   function applyCardTypeControlForScenario(state) {
-    var cardTypeSelect = document.getElementById('sandbox-card-type-select');
+    var cardTypeSelect = getSandboxCardTypeSelect();
+    var upsellSelect = getSandboxVisibleCardsSelect();
     var cardTypeGroup = cardTypeSelect && cardTypeSelect.closest('.sandbox-control-group');
-    if (!cardTypeSelect) {
+    var upsellGroup = upsellSelect && upsellSelect.closest('.sandbox-control-group');
+
+    if (isStage2TrimbleCreditsScenario(state)) {
+      if (cardTypeSelect) {
+        state.cardType = 'generic-plp';
+        cardTypeSelect.value = 'generic-plp';
+        cardTypeSelect.disabled = true;
+        cardTypeSelect.setAttribute('aria-disabled', 'true');
+        cardTypeSelect.title = STAGE2_CREDITS_UTILITY_LOCK_TITLE;
+        if (cardTypeGroup) {
+          cardTypeGroup.classList.add('sandbox-control-disabled');
+        }
+        setCardTypeOptionStates(cardTypeSelect, true);
+      }
+
+      state.upsell = '2-cards';
+      if (upsellSelect) {
+        upsellSelect.value = '2-cards';
+        upsellSelect.disabled = true;
+        upsellSelect.setAttribute('aria-disabled', 'true');
+        upsellSelect.title = STAGE2_CREDITS_UTILITY_LOCK_TITLE;
+        if (upsellGroup) {
+          upsellGroup.classList.add('sandbox-control-disabled');
+        }
+      }
       return;
     }
 
-    if (isStage2TrimbleCreditsScenario(state)) {
-      state.cardType = 'generic-plp';
-      cardTypeSelect.value = 'generic-plp';
-      cardTypeSelect.disabled = true;
-      cardTypeSelect.setAttribute('aria-disabled', 'true');
-      cardTypeSelect.title = 'Locked to Directory Gateways for Trimble Credits in Stage 2';
-      if (cardTypeGroup) {
-        cardTypeGroup.classList.add('sandbox-control-disabled');
+    if (upsellSelect) {
+      upsellSelect.disabled = false;
+      upsellSelect.removeAttribute('aria-disabled');
+      upsellSelect.title = '';
+      upsellSelect.value = normalizeUpsell(state.upsell);
+      if (upsellGroup) {
+        upsellGroup.classList.remove('sandbox-control-disabled');
       }
-      setCardTypeOptionStates(cardTypeSelect, true);
+    }
+
+    if (!cardTypeSelect) {
       return;
     }
 
@@ -1128,7 +1171,7 @@
 
     if (!silent && isStage2TrimbleCreditsScenario(state)) {
       announce(
-        'Scenario updated: Stage 2 Enhanced with Trimble Credits active. Card type locked to Directory Gateways with 2 fixed cards displayed.'
+        'Scenario updated: Stage 2 Enhanced with Trimble Credits active. Card type locked to Directory Gateways and visible cards fixed to 2.'
       );
     }
   }
@@ -1642,8 +1685,8 @@
     var roleSelect = document.getElementById('sandbox-role-select');
     var purchaseSelect = document.getElementById('sandbox-purchase-select');
     var promoSelect = document.getElementById('sandbox-promo-select');
-    var upsellSelect = document.getElementById('sandbox-upsell-select');
-    var cardTypeSelect = document.getElementById('sandbox-card-type-select');
+    var upsellSelect = getSandboxVisibleCardsSelect();
+    var cardTypeSelect = getSandboxCardTypeSelect();
     var matrixSelect = document.getElementById('sandbox-matrix-select');
     var linkToggle = document.getElementById('sandbox-link-toggle');
     var stageSelect = document.getElementById('sandbox-stage-select');
@@ -1758,6 +1801,13 @@
     });
 
     upsellSelect.addEventListener('change', function () {
+      if (
+        upsellSelect.disabled ||
+        upsellSelect.getAttribute('aria-disabled') === 'true' ||
+        isStage2TrimbleCreditsScenario(state)
+      ) {
+        return;
+      }
       state.upsell = normalizeUpsell(upsellSelect.value);
       upsellSelect.value = state.upsell;
       applyUpsellState(state.upsell, false, state);
@@ -1768,6 +1818,13 @@
     });
 
     cardTypeSelect.addEventListener('change', function () {
+      if (
+        cardTypeSelect.disabled ||
+        cardTypeSelect.getAttribute('aria-disabled') === 'true' ||
+        isStage2TrimbleCreditsScenario(state)
+      ) {
+        return;
+      }
       if (normalizeStage(state.stage) === 'stage-1') {
         cardTypeSelect.value = 'generic-plp';
         state.cardType = 'generic-plp';
